@@ -9,13 +9,13 @@ import {
   formatTimestamp,
   timeAgo,
   explorerUrl,
+  PROGRAM_ID,
   type AgentProfile,
   type Commitment,
 } from "@/lib/solprism";
 import { PublicKey } from "@solana/web3.js";
 
 const SEED_AGENT = Buffer.from("agent");
-const PROGRAM_ID = new PublicKey("CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu");
 
 export default function AgentDetailPage() {
   const params = useParams();

@@ -10,10 +10,10 @@ import { Connection, PublicKey } from "@solana/web3.js";
 // ─── Constants ──────────────────────────────────────────────────────────
 
 export const PROGRAM_ID = new PublicKey(
-  "CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu"
+  process.env.NEXT_PUBLIC_PROGRAM_ID || "CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu"
 );
 
-const RPC_URL = "https://api.devnet.solana.com";
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || "https://api.devnet.solana.com";
 
 const SEED_AGENT = Buffer.from("agent");
 const SEED_COMMITMENT = Buffer.from("commitment");
