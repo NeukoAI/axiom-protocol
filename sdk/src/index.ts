@@ -60,7 +60,18 @@ export {
 } from "./hash";
 
 // Re-export schema helpers
-export { createReasoningTrace } from "./schema";
+export { createReasoningTrace, createSimpleTrace } from "./schema";
+export type { CreateTraceInput } from "./schema";
 
-// Re-export client (when ready)
-// export { Axiom } from "./client";
+// Re-export client
+export {
+  SolprismClient,
+  SOLPRISM_PROGRAM_ID,
+  deriveAgentPDA,
+  deriveCommitmentPDA,
+  buildRegisterAgentIx,
+  buildCommitReasoningIx,
+  buildRevealReasoningIx,
+  deserializeAgentProfile,
+  deserializeCommitment,
+} from "./client";

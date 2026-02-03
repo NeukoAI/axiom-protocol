@@ -66,7 +66,7 @@ export function createReasoningTrace(input: CreateTraceInput): ReasoningTrace {
       }),
     },
     inputs: {
-      dataSources: input.dataSources ?? input.inputs.dataSources,
+      dataSources: input.inputs.dataSources,
       context: input.inputs.context,
     },
     analysis: {

@@ -10,7 +10,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@solana/kit": "^2.1.0",
+    "@coral-xyz/anchor": "^0.30.1",
     "@solana/web3.js": "^1.98.0"
   },
   "devDependencies": {
