@@ -1,0 +1,23 @@
+{
+  "name": "@solprism/mcp-server",
+  "version": "0.1.0",
+  "description": "SOLPRISM MCP Server — verifiable AI reasoning tools for Claude, Cursor, and any MCP client",
+  "main": "dist/index.js",
+  "bin": {
+    "solprism-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@solana/web3.js": "^1.98.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  },
+  "license": "MIT",
+  "keywords": ["solprism", "mcp", "solana", "ai", "reasoning", "verifiable"]
+}
