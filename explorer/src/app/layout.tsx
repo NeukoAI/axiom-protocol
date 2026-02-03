@@ -44,6 +44,9 @@ export default function RootLayout({
                 <a href="/verify" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Verify
                 </a>
+                <a href="/metrics" className="text-sm text-slate-400 hover:text-white transition-colors">
+                  Metrics
+                </a>
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   <span className="w-2 h-2 rounded-full bg-green-500 pulse-dot" />
                   Devnet
@@ -60,7 +63,7 @@ export default function RootLayout({
             <span>SOLPRISM Protocol — Verifiable AI Reasoning on Solana</span>
             <div className="flex items-center gap-4">
               <a
-                href="https://github.com/basedmereum/axiom-protocol"
+                href="https://github.com/NeukoAI/axiom-protocol"
                 className="hover:text-slate-300 transition-colors"
                 target="_blank"
               >

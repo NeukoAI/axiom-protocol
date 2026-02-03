@@ -238,7 +238,7 @@ export default function Dashboard() {
             <span className="text-slate-500">Source</span>
             <div className="mt-1">
               <a
-                href="https://github.com/basedmereum/axiom-protocol"
+                href="https://github.com/NeukoAI/axiom-protocol"
                 target="_blank"
                 className="text-blue-400 hover:text-blue-300 transition-colors"
               >
