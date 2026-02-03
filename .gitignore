@@ -1,0 +1,24 @@
+# Rust / Anchor build artifacts
+target/
+.anchor/
+
+# Node / TypeScript
+node_modules/
+dist/
+sdk/dist/
+sdk/node_modules/
+*.js.map
+
+# Solana
+test-ledger/
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.*
