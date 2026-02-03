@@ -7,7 +7,7 @@
  * ```typescript
  * import { Axiom, createReasoningTrace } from '@solprism/sdk';
  * 
- * const axiom = new Axiom({ rpcUrl: 'https://api.devnet.solana.com' });
+ * const client = new SolprismClient('https://api.devnet.solana.com');
  * 
  * // Create a reasoning trace
  * const trace = createReasoningTrace({
@@ -19,15 +19,15 @@
  * });
  * 
  * // Commit reasoning hash on-chain
- * const commitment = await axiom.commit(trace, wallet);
+ * const commitment = await client.commitReasoning(wallet, trace);
  * 
  * // Execute your action...
  * 
  * // Reveal full reasoning
- * const reveal = await axiom.reveal(commitment.commitmentAddress, trace, wallet);
+ * const reveal = await client.revealReasoning(wallet, commitment.commitmentAddress, 'ipfs://...');
  * 
  * // Anyone can verify
- * const result = await axiom.verify(commitment.commitmentAddress, trace);
+ * const result = await client.verifyReasoning(commitment.commitmentAddress, trace);
  * console.log(result.valid); // true
  * ```
  * 
@@ -42,7 +42,7 @@ export type {
   Alternative,
   OnChainCommitment,
   OnChainAgentProfile,
-  AxiomConfig,
+  SolprismConfig,
   CommitResult,
   RevealResult,
   VerifyResult,

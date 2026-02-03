@@ -81,8 +81,8 @@ SOLPRISM is a protocol that lets AI agents publish **verifiable proofs of their 
 
 | Component | Status | Description |
 |-----------|--------|-------------|
-| **Solana Program** | 🔨 Building | Anchor program for reasoning commitments |
-| **TypeScript SDK** | 🔨 Building | `@solprism/sdk` — commit, reveal, verify |
+| **Solana Program** | ✅ Deployed | Anchor program on devnet (`CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu`) |
+| **TypeScript SDK** | ✅ Complete | `@solprism/sdk` — commit, reveal, verify, all tested on devnet |
 | **Reasoning Schema** | ✅ Defined | Standardized format for AI reasoning traces |
 | **Explorer** | 🔨 Building | Web UI to browse and verify reasoning |
 | **Demo Agent** | 🔨 Building | Live agent publishing reasoning in real-time |

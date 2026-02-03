@@ -2,15 +2,16 @@ use anchor_lang::prelude::*;
 
 declare_id!("CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu");
 
-/// AXIOM Protocol — Verifiable AI Reasoning on Solana
+/// SOLPRISM — Verifiable AI Reasoning on Solana
 /// 
 /// Agents commit hashes of their reasoning before executing actions.
 /// Anyone can verify the reasoning matches the on-chain commitment.
+/// (Anchor module name remains "axiom" for deployment compatibility)
 #[program]
 pub mod axiom {
     use super::*;
 
-    /// Register a new agent profile on AXIOM.
+    /// Register a new agent profile on SOLPRISM.
     pub fn register_agent(
         ctx: Context<RegisterAgent>,
         name: String,

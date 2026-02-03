@@ -146,7 +146,7 @@ export interface OnChainAgentProfile {
 // ─── SDK Types ─────────────────────────────────────────────────────────────
 
 /** Configuration for SOLPRISM SDK client */
-export interface AxiomConfig {
+export interface SolprismConfig {
   /** Solana RPC endpoint URL */
   rpcUrl?: string;
   /** SOLPRISM program ID on-chain */

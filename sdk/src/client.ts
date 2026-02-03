@@ -18,7 +18,7 @@ import { Program, AnchorProvider, Wallet, BN, Idl } from "@coral-xyz/anchor";
 
 import {
   ReasoningTrace,
-  AxiomConfig,
+  SolprismConfig,
   CommitResult,
   RevealResult,
   VerifyResult,
