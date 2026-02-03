@@ -33,6 +33,9 @@ export default function RootLayout({
               </a>
               <div className="flex items-center gap-6">
                 <a href="/" className="text-sm text-slate-400 hover:text-white transition-colors">
+                  Explorer
+                </a>
+                <a href="/dashboard" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Dashboard
                 </a>
                 <a href="/agents" className="text-sm text-slate-400 hover:text-white transition-colors">
