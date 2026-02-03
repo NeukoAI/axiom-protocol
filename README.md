@@ -25,13 +25,17 @@ SOLPRISM lets AI agents publish **verifiable proofs of their reasoning** on Sola
 
 | Component | Status | Description |
 |-----------|--------|-------------|
-| **Solana Program** | ✅ Deployed | Anchor program on devnet |
-| **TypeScript SDK** | ✅ Complete | `SolprismClient` — commit, reveal, verify |
-| **Explorer Frontend** | ✅ Live | [solprism.app](https://www.solprism.app/) — browse agents, commitments, verify reasoning |
-| **Demo Traces** | ✅ 300+ onchain | Agents committing verifiable reasoning on devnet |
-| **Submission Video** | 🔨 Remotion | Programmatic video from React components |
+| **Solana Program** | ✅ Mainnet & Devnet | Anchor program, **immutable** (upgrade authority revoked) |
+| **TypeScript SDK** | ✅ [`@solprism/sdk`](https://www.npmjs.com/package/@solprism/sdk) | `npm install @solprism/sdk` |
+| **Explorer** | ✅ [solprism.app](https://www.solprism.app/) | Dashboard, agents, verify, metrics — zero backend |
+| **Eliza Plugin** | ✅ Shipped | 4 actions, drop into any Eliza agent |
+| **solana-agent-kit** | ✅ Shipped | LangChain tools + plugin, 3 integration modes |
+| **MCP Server** | ✅ Shipped | 5 tools for Claude Desktop + Cursor |
+| **Mainnet Traces** | ✅ Live | Real reasoning committed by Mereum on mainnet |
 
-**Program ID:** `CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu`
+**Program ID:** `CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu` (same on mainnet + devnet)
+
+> ⚠️ **Immutable**: Upgrade authority revoked to `11111111111111111111111111111111`. Nobody can modify this program — including its creator.
 
 ## Explorer
 
@@ -51,16 +55,27 @@ The SOLPRISM Explorer reads directly from the program on Solana devnet — zero 
 cd explorer && npm install && npm run dev
 ```
 
-## SDK Quick Start
+## Install
+
+```bash
+npm install @solprism/sdk
+```
+
+## Quick Start (5 lines)
 
 ```typescript
 import { SolprismClient, createReasoningTrace } from "@solprism/sdk";
+import { Connection, Keypair } from "@solana/web3.js";
 
-const client = new SolprismClient("https://api.devnet.solana.com");
+const connection = new Connection("https://api.devnet.solana.com");
+const client = new SolprismClient(connection, wallet);
 
-// Create a reasoning trace
+// 1. Register your agent
+await client.registerAgent(wallet, "MyTradingBot");
+
+// 2. Create a reasoning trace
 const trace = createReasoningTrace({
-  agent: "YourAgent",
+  agent: "MyTradingBot",
   action: { type: "trade", description: "Swap SOL for USDC" },
   inputs: {
     dataSources: [
@@ -83,11 +98,57 @@ const trace = createReasoningTrace({
   }
 });
 
-// Commit → Reveal → Verify
-const result = await client.commitReasoning(wallet, trace);
-await client.revealReasoning(wallet, result.commitmentAddress, "ipfs://...");
-const verified = await client.verifyReasoning(result.commitmentAddress, trace);
-// ✅ Reasoning verified — the trace matches the onchain commitment
+// 3. Commit → Execute → Reveal → Verify
+const commit = await client.commitReasoning(wallet, trace);
+// ... execute your action ...
+await client.revealReasoning(wallet, commit.commitmentAddress, "ipfs://your-trace-uri");
+const verified = await client.verifyReasoning(commit.commitmentAddress, trace);
+console.log(verified.verified); // true ✅
+```
+
+## Minimal Integration (3 lines, raw hash)
+
+Don't want the full schema? Commit any SHA-256 hash:
+
+```typescript
+import { createHash } from "crypto";
+import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction, SystemProgram } from "@solana/web3.js";
+
+const PROGRAM_ID = new PublicKey("CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu");
+const COMMIT_DISC = Buffer.from([163, 80, 25, 135, 94, 49, 218, 44]);
+
+// Hash your reasoning (any string)
+const reasoning = JSON.stringify({ action: "trade", why: "SOL overbought", confidence: 85 });
+const hash = createHash("sha256").update(reasoning).digest();
+
+// Derive PDAs
+const [agentPda] = PublicKey.findProgramAddressSync(
+  [Buffer.from("agent"), wallet.publicKey.toBuffer()], PROGRAM_ID
+);
+const commitId = `my-commit-${Date.now()}`;
+const [commitPda] = PublicKey.findProgramAddressSync(
+  [Buffer.from("commitment"), wallet.publicKey.toBuffer(), Buffer.from(commitId)], PROGRAM_ID
+);
+
+// Build instruction
+const idBuf = Buffer.alloc(4 + commitId.length);
+idBuf.writeUInt32LE(commitId.length, 0);
+idBuf.write(commitId, 4);
+
+const ix = new TransactionInstruction({
+  keys: [
+    { pubkey: commitPda, isSigner: false, isWritable: true },
+    { pubkey: agentPda, isSigner: false, isWritable: true },
+    { pubkey: wallet.publicKey, isSigner: true, isWritable: true },
+    { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+  ],
+  programId: PROGRAM_ID,
+  data: Buffer.concat([COMMIT_DISC, hash, idBuf]),
+});
+
+// Send it
+const tx = new Transaction().add(ix);
+await sendAndConfirmTransaction(connection, tx, [wallet]);
 ```
 
 ## What a Reasoning Trace Captures
@@ -117,6 +178,29 @@ const verified = await client.verifyReasoning(result.commitmentAddress, trace);
 }
 ```
 
+## Framework Integrations
+
+### Eliza (elizaOS)
+```bash
+# Copy integrations/eliza-plugin/ into your Eliza agent
+```
+4 actions: `registerAgent`, `commitReasoning`, `revealReasoning`, `verifyReasoning`. Self-contained — no external dependencies beyond `@solana/web3.js`.
+
+### solana-agent-kit (SendAI)
+```bash
+# Three modes: LangChain tools, plugin, or direct actions
+```
+Drop-in LangChain tools for any solana-agent-kit agent. PR: [sendaifun/solana-agent-kit#515](https://github.com/sendaifun/solana-agent-kit/issues/515).
+
+### MCP Server (Claude Desktop / Cursor)
+```bash
+cd integrations/mcp-server && npm install && npm start
+```
+5 tools: `register_agent`, `commit_reasoning`, `reveal_reasoning`, `verify_reasoning`, `get_agent_profile`. Add to your Claude Desktop or Cursor config.
+
+### Raw Instructions
+Every integration uses raw transaction instructions with embedded discriminators — zero dependency on Anchor client. Works anywhere `@solana/web3.js` runs.
+
 ## Architecture
 
 ```
@@ -139,9 +223,17 @@ const verified = await client.verifyReasoning(result.commitmentAddress, trace);
                │                     │
        ┌───────▼─────────────────────▼─────────┐
        │          SOLPRISM Explorer              │
-       │   Browse • Search • Verify • Score     │
+       │   Browse • Search • Verify • Metrics   │
        └────────────────────────────────────────┘
 ```
+
+## Mainnet Deployment
+
+The SOLPRISM program is deployed to **Solana mainnet** and **devnet** with the same Program ID.
+
+- **Mainnet deploy tx**: `64ER23Lp7w5XvxruLRrjPsbjyfHRS9VMjr1nC6WdBcFeBPorqVeS5LBwGMWGkZwyMKHXHwSwEcdcwdS2dk3Ct3Ef`
+- **Upgrade authority**: `11111111111111111111111111111111` (revoked — program is immutable)
+- **Verify on Solscan**: [solscan.io/account/CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu](https://solscan.io/account/CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu)
 
 ## Project Structure
 
@@ -155,6 +247,10 @@ const verified = await client.verifyReasoning(result.commitmentAddress, trace);
 │   └── test/              # Integration tests (7/7 passing)
 ├── explorer/              # Next.js frontend
 │   └── src/app/           # Dashboard, agents, verify pages
+├── integrations/
+│   ├── eliza-plugin/      # Eliza framework plugin
+│   ├── solana-agent-kit/  # SendAI solana-agent-kit integration
+│   └── mcp-server/        # MCP server for Claude/Cursor
 ├── demo/                  # Demo scripts + traces
 └── video/                 # Remotion submission video
 ```
