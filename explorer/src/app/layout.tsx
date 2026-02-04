@@ -33,7 +33,7 @@ export default function RootLayout({
               </a>
               <div className="flex items-center gap-6">
                 <a href="/" className="text-sm text-slate-400 hover:text-white transition-colors">
-                  Explorer
+                  Traction
                 </a>
                 <a href="/dashboard" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Dashboard
@@ -49,7 +49,7 @@ export default function RootLayout({
                 </a>
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   <span className="w-2 h-2 rounded-full bg-green-500 pulse-dot" />
-                  Devnet
+                  Live
                 </div>
               </div>
             </div>

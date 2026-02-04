@@ -12,9 +12,9 @@ const MAINNET_RPC = "https://api.mainnet-beta.solana.com";
 const DEVNET_RPC = "https://api.devnet.solana.com";
 const REFRESH_INTERVAL = 30_000;
 
-// Account discriminators (first 8 bytes)
-const DISC_AGENT = Buffer.from([135, 157, 66, 195, 2, 113, 175, 30]);
-const DISC_COMMITMENT = Buffer.from([163, 80, 25, 135, 94, 49, 218, 44]);
+// Account discriminators (first 8 bytes — from IDL account definitions)
+const DISC_AGENT = Buffer.from([60, 227, 42, 24, 0, 87, 86, 205]);
+const DISC_COMMITMENT = Buffer.from([67, 22, 65, 98, 26, 124, 5, 25]);
 
 // ─── Types ──────────────────────────────────────────────────────────────
 
