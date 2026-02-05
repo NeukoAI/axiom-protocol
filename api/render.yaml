@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: solprism-api
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: MAINNET_RPC
+        sync: false
+      - key: DEVNET_RPC
+        sync: false
