@@ -9,6 +9,7 @@ Ready-made integrations for adding verifiable AI reasoning to your agent, framew
 | [Eliza Plugin](./eliza-plugin/) | ElizaOS | ✅ Ready | Plugin for the Eliza AI agent framework |
 | [solana-agent-kit](./solana-agent-kit/) | SendAI | ✅ Ready | LangChain tools for solana-agent-kit |
 | [MCP Server](./mcp-server/) | MCP | ✅ Ready | Tools for Claude, Cursor, and MCP clients |
+| [AgentBets](./agentbets/) | Prediction Markets | ✅ Ready | Verifiable market resolution for AI prediction markets |
 
 ## Quick Start (Any Framework)
 
