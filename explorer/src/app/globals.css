@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0a0e17;
-  --bg-secondary: #111827;
-  --bg-card: #1a2235;
-  --border: #1e293b;
+  --bg-primary: #0B0B0F;
+  --bg-secondary: #13111C;
+  --bg-card: #1A1726;
+  --border: #1E1A2E;
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
-  --accent: #3aa5f8;
-  --accent-dim: #094a85;
-  --green: #22c55e;
+  --solana-purple: #9945FF;
+  --solana-green: #14F195;
+  --green: #14F195;
   --red: #ef4444;
   --yellow: #eab308;
 }
@@ -25,7 +25,7 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #2d3b52; }
+::-webkit-scrollbar-thumb:hover { background: #2d2845; }
 
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -45,59 +45,126 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* Hero grid background */
+/* Animated grid background */
 .hero-grid {
   background-image:
-    linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(rgba(153, 69, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(153, 69, 255, 0.08) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: grid-fade 8s ease-in-out infinite;
 }
 
-/* Feed item entrance animation */
-@keyframes feed-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.feed-item {
-  animation: feed-slide-in 0.4s ease-out both;
+@keyframes grid-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
 }
 
-/* Glow effect for hero stats */
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 15px rgba(58, 165, 248, 0.05); }
-  50% { box-shadow: 0 0 25px rgba(58, 165, 248, 0.1); }
+/* Solana gradient text */
+.solana-gradient-text {
+  background: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Gradient text animation */
+.solana-gradient-text-animated {
+  background: linear-gradient(135deg, #9945FF, #14F195, #9945FF);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 6s ease infinite;
+}
+
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
 
-.gradient-text-animated {
-  background-size: 200% 200%;
-  animation: gradient-shift 6s ease infinite;
+/* Glowing orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.orb-purple {
+  background: radial-gradient(circle, rgba(153, 69, 255, 0.3), transparent 70%);
+}
+
+.orb-green {
+  background: radial-gradient(circle, rgba(20, 241, 149, 0.2), transparent 70%);
+}
+
+/* Feed item entrance animation */
+@keyframes feed-slide-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.feed-item { animation: feed-slide-in 0.4s ease-out both; }
+
+/* Vote CTA shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.vote-cta-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Glow border effect */
+.glow-border {
+  position: relative;
+}
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(153, 69, 255, 0.3), rgba(20, 241, 149, 0.3));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.glow-border:hover::before {
+  opacity: 1;
 }
 
 /* Tabular numbers for metrics */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Smooth transitions for chart bars */
-@keyframes bar-grow {
-  from { transform: scaleY(0); }
-  to { transform: scaleY(1); }
-}
+.tabular-nums { font-variant-numeric: tabular-nums; }
 
 /* Selection color */
 ::selection {
-  background-color: rgba(58, 165, 248, 0.3);
+  background-color: rgba(153, 69, 255, 0.3);
   color: white;
+}
+
+/* Particle dots */
+@keyframes particle-float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+  25% { transform: translateY(-30px) translateX(10px); opacity: 0.8; }
+  50% { transform: translateY(-10px) translateX(-10px); opacity: 0.5; }
+  75% { transform: translateY(-40px) translateX(5px); opacity: 0.7; }
+}
+
+/* Card hover glow */
+.card-solana {
+  background: rgba(19, 17, 28, 0.8);
+  border: 1px solid rgba(30, 26, 46, 0.6);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+.card-solana:hover {
+  border-color: rgba(153, 69, 255, 0.3);
+  box-shadow: 0 0 30px rgba(153, 69, 255, 0.05);
+}
+
+/* Sticky vote banner */
+.vote-banner {
+  background: linear-gradient(135deg, rgba(153, 69, 255, 0.15), rgba(20, 241, 149, 0.1));
+  border-bottom: 1px solid rgba(153, 69, 255, 0.2);
 }

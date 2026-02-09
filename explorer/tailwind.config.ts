@@ -5,18 +5,38 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        solprism: {
-          50: "#f0f7ff",
-          100: "#e0eefe",
-          200: "#baddfd",
-          300: "#7ec3fc",
-          400: "#3aa5f8",
-          500: "#108ae9",
-          600: "#046dc7",
-          700: "#0557a1",
-          800: "#094a85",
-          900: "#0d3f6e",
-          950: "#092849",
+        solana: {
+          purple: "#9945FF",
+          green: "#14F195",
+          dark: "#0B0B0F",
+          darker: "#08080C",
+          card: "#13111C",
+          border: "#1E1A2E",
+        },
+      },
+      animation: {
+        "float": "float 6s ease-in-out infinite",
+        "float-delayed": "float 6s ease-in-out 3s infinite",
+        "glow": "glow 4s ease-in-out infinite",
+        "gradient-x": "gradient-x 6s ease infinite",
+        "grid-fade": "grid-fade 8s ease-in-out infinite",
+      },
+      keyframes: {
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        glow: {
+          "0%, 100%": { opacity: "0.4" },
+          "50%": { opacity: "0.8" },
+        },
+        "gradient-x": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "grid-fade": {
+          "0%, 100%": { opacity: "0.03" },
+          "50%": { opacity: "0.06" },
         },
       },
     },
