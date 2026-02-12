@@ -267,6 +267,37 @@ async function commitReasoning(
     throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
   }
   
+  // Now reveal the reasoning immediately
+  const commitPdaAddress = commitPda;
+  const REVEAL_DISC = Buffer.from([76, 215, 6, 241, 209, 207, 84, 96]);
+  const reasoningUri = `https://solscan.io/tx/${sig}`;
+  const uriBuf = Buffer.alloc(4 + reasoningUri.length);
+  uriBuf.writeUInt32LE(reasoningUri.length, 0);
+  uriBuf.write(reasoningUri, 4);
+
+  const revealIx = new TransactionInstruction({
+    keys: [
+      { pubkey: commitPdaAddress, isSigner: false, isWritable: true },
+      { pubkey: agentPda, isSigner: false, isWritable: true },
+      { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
+    ],
+    programId: PROGRAM_ID,
+    data: Buffer.concat([REVEAL_DISC, uriBuf]),
+  });
+
+  const revealTx = new Transaction().add(revealIx);
+  revealTx.feePayer = wallet.publicKey;
+  revealTx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+  revealTx.sign(wallet);
+
+  const revealSig = await connection.sendRawTransaction(revealTx.serialize(), { skipPreflight: true });
+  const revealConf = await connection.confirmTransaction(revealSig, "confirmed");
+  if (revealConf.value.err) {
+    log(`⚠️ Reveal failed: ${JSON.stringify(revealConf.value.err)}`);
+  } else {
+    log(`✅ Revealed: https://solscan.io/tx/${revealSig}`);
+  }
+
   return { sig, commitId, hash: reasoningHash.toString("hex") };
 }
 

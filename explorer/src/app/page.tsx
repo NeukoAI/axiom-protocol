@@ -34,91 +34,106 @@ function AnimatedNumber({ target, duration = 1200 }: { target: number; duration?
   return <>{current.toLocaleString()}</>;
 }
 
+// ─── Stagger Wrapper ────────────────────────────────────────────────────
+
+function Stagger({ children, index, className = "" }: { children: React.ReactNode; index: number; className?: string }) {
+  return (
+    <div className={`animate-fade-up ${className}`} style={{ animationDelay: `${index * 80 + 100}ms` }}>
+      {children}
+    </div>
+  );
+}
+
 // ─── Hero Stat Card ─────────────────────────────────────────────────────
 
 function HeroStat({
-  label, value, icon, gradient, sub, loading,
+  label, value, icon, gradient, sub, loading, index,
 }: {
-  label: string; value: number; icon: React.ReactNode; gradient: string; sub?: string; loading?: boolean;
+  label: string; value: number; icon: React.ReactNode; gradient: string; sub?: string; loading?: boolean; index: number;
 }) {
   return (
-    <div className="relative group">
-      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${gradient} opacity-[0.05] group-hover:opacity-[0.12] transition-opacity duration-500`} />
-      <div className="relative card-solana rounded-2xl p-6">
-        <div className="flex items-center gap-3 mb-3">
-          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white/90 shadow-lg`}>
-            {icon}
-          </div>
-          <span className="text-sm text-slate-400 font-medium">{label}</span>
-        </div>
-        {loading ? (
-          <div className="h-10 w-24 bg-slate-700/50 rounded-lg animate-pulse" />
-        ) : (
-          <>
-            <div className="text-4xl font-bold tracking-tight">
-              <AnimatedNumber target={value} />
+    <Stagger index={index}>
+      <div className="relative group h-full">
+        {/* Glow on hover */}
+        <div className={`absolute -inset-0.5 rounded-2xl bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-[0.08] blur-xl transition-all duration-700`} />
+        <div className="relative card-solana rounded-2xl p-6 h-full">
+          <div className="flex items-center gap-3 mb-4">
+            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white/90 shadow-lg`}>
+              {icon}
             </div>
-            {sub && <div className="text-xs text-slate-500 mt-1.5">{sub}</div>}
-          </>
-        )}
+            <span className="text-[13px] text-[#8b87a0] font-medium">{label}</span>
+          </div>
+          {loading ? (
+            <div className="h-11 w-28 bg-[#1a1628] rounded-lg animate-pulse" />
+          ) : (
+            <>
+              <div className="text-4xl font-[family-name:var(--font-syne)] font-extrabold tracking-tight">
+                <AnimatedNumber target={value} />
+              </div>
+              {sub && <div className="text-[11px] text-[#6b6780] mt-2 tracking-wide">{sub}</div>}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </Stagger>
   );
 }
 
 // ─── Network Badge ──────────────────────────────────────────────────────
 
-function NetworkCard({ stats, accent }: { stats: NetworkStats; accent: "green" | "purple" }) {
+function NetworkCard({ stats, accent, index }: { stats: NetworkStats; accent: "green" | "purple"; index: number }) {
   const colors = {
     green: {
-      bg: "from-[#14F195]/10 to-[#14F195]/5",
-      border: "border-[#14F195]/20 hover:border-[#14F195]/40",
-      pill: "bg-[#14F195]/10 text-[#14F195] border-[#14F195]/20",
+      bg: "from-[#14F195]/[0.06] to-[#14F195]/[0.02]",
+      border: "border-[#14F195]/15 hover:border-[#14F195]/30",
       text: "text-[#14F195]",
       dot: "bg-[#14F195]",
+      glow: "shadow-[#14F195]/5",
     },
     purple: {
-      bg: "from-[#9945FF]/10 to-[#9945FF]/5",
-      border: "border-[#9945FF]/20 hover:border-[#9945FF]/40",
-      pill: "bg-[#9945FF]/10 text-[#9945FF] border-[#9945FF]/20",
+      bg: "from-[#9945FF]/[0.06] to-[#9945FF]/[0.02]",
+      border: "border-[#9945FF]/15 hover:border-[#9945FF]/30",
       text: "text-[#9945FF]",
       dot: "bg-[#9945FF]",
+      glow: "shadow-[#9945FF]/5",
     },
   }[accent];
 
   return (
-    <div className={`bg-gradient-to-br ${colors.bg} border ${colors.border} rounded-2xl p-6 transition-all duration-300`}>
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${colors.dot} pulse-dot`} />
-          <span className={`text-xs font-semibold uppercase tracking-wider ${colors.text}`}>
-            {stats.network}
-          </span>
-        </div>
-        {stats.error && (
-          <span className="text-xs text-red-400/70 truncate max-w-[150px]">⚠ {stats.error}</span>
-        )}
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        {[
-          { label: "Agents", value: stats.agents },
-          { label: "Commits", value: stats.commitments },
-          { label: "Reveals", value: stats.reveals },
-          { label: "Rate", value: stats.revealRate, suffix: "%" },
-        ].map((item) => (
-          <div key={item.label}>
-            <div className="text-xs text-slate-500 mb-0.5">{item.label}</div>
-            {stats.loading ? (
-              <div className="h-6 w-12 bg-slate-700/50 rounded animate-pulse" />
-            ) : (
-              <div className="text-lg font-bold">
-                {item.value.toLocaleString()}{item.suffix || ""}
-              </div>
-            )}
+    <Stagger index={index}>
+      <div className={`bg-gradient-to-br ${colors.bg} border ${colors.border} rounded-2xl p-6 transition-all duration-500 hover:shadow-lg ${colors.glow}`}>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2.5">
+            <span className={`w-2 h-2 rounded-full ${colors.dot} pulse-dot`} />
+            <span className={`text-[11px] font-bold uppercase tracking-[0.2em] ${colors.text}`}>
+              {stats.network}
+            </span>
           </div>
-        ))}
+          {stats.error && (
+            <span className="text-[11px] text-red-400/60 truncate max-w-[140px]">⚠ {stats.error}</span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-5">
+          {[
+            { label: "Agents", value: stats.agents },
+            { label: "Commits", value: stats.commitments },
+            { label: "Reveals", value: stats.reveals },
+            { label: "Rate", value: stats.revealRate, suffix: "%" },
+          ].map((item) => (
+            <div key={item.label}>
+              <div className="text-[11px] text-[#6b6780] mb-1 tracking-wide">{item.label}</div>
+              {stats.loading ? (
+                <div className="h-7 w-14 bg-[#1a1628] rounded animate-pulse" />
+              ) : (
+                <div className="text-xl font-[family-name:var(--font-syne)] font-bold">
+                  {item.value.toLocaleString()}{item.suffix || ""}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </Stagger>
   );
 }
 
@@ -130,41 +145,41 @@ function ActivityChart({ data, loading }: { data: Record<string, number>; loadin
 
   return (
     <div className="card-solana rounded-2xl p-6">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9945FF]/20 to-[#14F195]/20 border border-solana-border flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9945FF]/15 to-[#14F195]/15 border border-[#1a1628] flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#14F195]">
               <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
             </svg>
           </div>
           <div>
             <h3 className="text-sm font-semibold">Activity Timeline</h3>
-            <p className="text-xs text-slate-500">Daily reasoning commitments</p>
+            <p className="text-[11px] text-[#6b6780]">Daily reasoning commitments</p>
           </div>
         </div>
-        <span className="text-xs text-slate-600">Last 14 days</span>
+        <span className="text-[11px] text-[#4a4660] font-[family-name:var(--font-mono)]">14d</span>
       </div>
       {loading ? (
-        <div className="flex items-end gap-2 h-36">
+        <div className="flex items-end gap-2 h-40">
           {Array.from({ length: 14 }).map((_, i) => (
-            <div key={i} className="flex-1 bg-slate-700/30 rounded-t animate-pulse" style={{ height: `${20 + Math.random() * 80}%` }} />
+            <div key={i} className="flex-1 bg-[#1a1628] rounded-t animate-pulse" style={{ height: `${20 + Math.random() * 80}%` }} />
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <div className="flex items-center justify-center h-36 text-slate-500 text-sm">No activity data yet</div>
+        <div className="flex items-center justify-center h-40 text-[#6b6780] text-sm">No activity data yet</div>
       ) : (
-        <div className="flex items-end gap-1.5 h-36">
+        <div className="flex items-end gap-[5px] h-40">
           {entries.map(([date, count], i) => (
-            <div key={date} className="flex-1 group flex flex-col items-center gap-1">
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-slate-400 font-medium">{count}</div>
+            <div key={date} className="flex-1 group flex flex-col items-center gap-1.5">
+              <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] text-[#8b87a0] font-[family-name:var(--font-mono)] font-medium -translate-y-1 group-hover:translate-y-0">{count}</div>
               <div
-                className="w-full rounded-t-md transition-all duration-700 ease-out relative overflow-hidden"
-                style={{ height: `${Math.max((count / max) * 100, 4)}%`, animationDelay: `${i * 60}ms` }}
+                className="w-full rounded-t transition-all duration-700 ease-out relative overflow-hidden group-hover:shadow-lg group-hover:shadow-[#9945FF]/10"
+                style={{ height: `${Math.max((count / max) * 100, 6)}%`, animationDelay: `${i * 60}ms` }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-[#9945FF] via-purple-400 to-[#14F195] opacity-90" />
-                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10" />
+                <div className="absolute inset-0 bar-gradient opacity-80 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/[0.06]" />
               </div>
-              <div className="text-[9px] text-slate-600 mt-0.5 tabular-nums">{date.slice(5)}</div>
+              <div className="text-[9px] text-[#4a4660] font-[family-name:var(--font-mono)] mt-0.5">{date.slice(5)}</div>
             </div>
           ))}
         </div>
@@ -179,9 +194,9 @@ function ActionTypeChart({ data, loading }: { data: Record<string, number>; load
   const entries = Object.entries(data).sort((a, b) => b[1] - a[1]);
   const total = entries.reduce((s, e) => s + e[1], 0);
   const colors = [
-    "from-[#9945FF] to-purple-400",
-    "from-[#14F195] to-emerald-300",
-    "from-purple-400 to-[#14F195]",
+    "from-[#9945FF] to-[#b66dff]",
+    "from-[#14F195] to-[#5dffc0]",
+    "from-[#b66dff] to-[#14F195]",
     "from-amber-500 to-yellow-400",
     "from-rose-500 to-pink-400",
     "from-indigo-500 to-blue-400",
@@ -189,40 +204,40 @@ function ActionTypeChart({ data, loading }: { data: Record<string, number>; load
 
   return (
     <div className="card-solana rounded-2xl p-6">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9945FF]/20 to-purple-500/20 border border-solana-border flex items-center justify-center">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9945FF]/15 to-purple-500/10 border border-[#1a1628] flex items-center justify-center">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#9945FF]">
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
           </svg>
         </div>
         <div>
           <h3 className="text-sm font-semibold">Action Types</h3>
-          <p className="text-xs text-slate-500">Reasoning commitment categories</p>
+          <p className="text-[11px] text-[#6b6780]">Reasoning categories</p>
         </div>
       </div>
       {loading ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-6 bg-slate-700/30 rounded animate-pulse" />
+            <div key={i} className="h-7 bg-[#1a1628] rounded animate-pulse" />
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <div className="text-slate-500 text-sm text-center py-8">No data yet</div>
+        <div className="text-[#6b6780] text-sm text-center py-10">No data yet</div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {entries.slice(0, 6).map(([type, count], i) => {
             const pct = total > 0 ? Math.round((count / total) * 100) : 0;
             return (
-              <div key={type}>
-                <div className="flex justify-between text-sm mb-1.5">
-                  <span className="text-slate-300 font-medium">{type}</span>
-                  <span className="text-slate-500 tabular-nums">{count} <span className="text-slate-600">({pct}%)</span></span>
+              <div key={type} className="group">
+                <div className="flex justify-between text-[13px] mb-2">
+                  <span className="text-[#c5c2d4] font-medium">{type}</span>
+                  <span className="text-[#6b6780] font-[family-name:var(--font-mono)] text-[12px]">{count} <span className="text-[#4a4660]">({pct}%)</span></span>
                 </div>
-                <div className="w-full bg-slate-800/60 rounded-full h-2 overflow-hidden">
-                  <div className={`h-2 rounded-full bg-gradient-to-r ${colors[i % colors.length]} transition-all duration-1000 ease-out`} style={{ width: `${pct}%` }} />
+                <div className="w-full bg-[#110f1a] rounded-full h-[6px] overflow-hidden">
+                  <div className={`h-full rounded-full bg-gradient-to-r ${colors[i % colors.length]} transition-all duration-1000 ease-out group-hover:shadow-sm`} style={{ width: `${pct}%` }} />
                 </div>
               </div>
             );
@@ -238,9 +253,9 @@ function ActionTypeChart({ data, loading }: { data: Record<string, number>; load
 function LiveFeed({ commitments, loading }: { commitments: Commitment[]; loading?: boolean }) {
   return (
     <div className="card-solana rounded-2xl p-6">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#14F195]/20 to-emerald-500/20 border border-solana-border flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#14F195]/15 to-emerald-500/10 border border-[#1a1628] flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#14F195]">
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
@@ -248,60 +263,62 @@ function LiveFeed({ commitments, loading }: { commitments: Commitment[]; loading
           </div>
           <div>
             <h3 className="text-sm font-semibold">Live Activity</h3>
-            <p className="text-xs text-slate-500">Recent reasoning commitments</p>
+            <p className="text-[11px] text-[#6b6780]">Recent reasoning commitments</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-[#14F195] pulse-dot" />
-          <span className="text-xs text-[#14F195] font-medium">Live</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#14F195] pulse-dot" />
+          <span className="text-[11px] text-[#14F195] font-semibold tracking-wide">Live</span>
         </div>
       </div>
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 bg-slate-700/20 rounded-xl animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />
+            <div key={i} className="h-16 bg-[#110f1a] rounded-xl animate-pulse" style={{ animationDelay: `${i * 120}ms` }} />
           ))}
         </div>
       ) : commitments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-3 text-slate-600">
-            <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-          </svg>
-          <span className="text-sm">No activity yet</span>
-          <span className="text-xs text-slate-600 mt-1">Waiting for first commit...</span>
+        <div className="flex flex-col items-center justify-center py-16 text-[#6b6780]">
+          <div className="w-12 h-12 rounded-full bg-[#110f1a] flex items-center justify-center mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#4a4660]">
+              <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+            </svg>
+          </div>
+          <span className="text-sm font-medium">No activity yet</span>
+          <span className="text-[11px] text-[#4a4660] mt-1">Waiting for first commit...</span>
         </div>
       ) : (
-        <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
+        <div className="space-y-1 max-h-[520px] overflow-y-auto pr-1 custom-scrollbar">
           {commitments.map((c, i) => (
             <a
               key={c.address}
               href={`/commitment/${c.address}`}
-              className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#9945FF]/5 transition-all duration-200 group feed-item"
-              style={{ animationDelay: `${i * 80}ms` }}
+              className="flex items-start gap-3.5 p-3.5 rounded-xl hover:bg-[#9945FF]/[0.04] transition-all duration-300 group feed-item border border-transparent hover:border-[#1a1628]"
+              style={{ animationDelay: `${i * 60}ms` }}
             >
-              <div className="mt-1.5 flex-shrink-0">
-                <div className={`w-2.5 h-2.5 rounded-full ${c.revealed ? "bg-[#14F195] shadow-[#14F195]/50 shadow-sm" : "bg-amber-500 shadow-amber-500/50 shadow-sm"}`} />
+              <div className="mt-2 flex-shrink-0">
+                <div className={`w-2 h-2 rounded-full ${c.revealed ? "bg-[#14F195] shadow-[0_0_8px_rgba(20,241,149,0.4)]" : "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.3)]"}`} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="hash-text text-slate-300 text-xs">{truncateAddress(c.commitmentHash, 6)}</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#9945FF]/10 text-[#9945FF] border border-[#9945FF]/20">{c.actionType}</span>
-                  <span className="text-[10px] text-slate-600">{c.confidence}%</span>
+                  <span className="font-[family-name:var(--font-mono)] text-[#c5c2d4] text-[12px]">{truncateAddress(c.commitmentHash, 6)}</span>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#9945FF]/[0.08] text-[#b66dff] border border-[#9945FF]/15">{c.actionType}</span>
+                  <span className="text-[10px] text-[#4a4660] font-[family-name:var(--font-mono)]">{c.confidence}%</span>
                   {c.network && (
-                    <span className={`text-[10px] font-medium ${c.network === "mainnet" ? "text-[#14F195]/70" : "text-[#9945FF]/70"}`}>{c.network}</span>
+                    <span className={`text-[10px] font-semibold ${c.network === "mainnet" ? "text-[#14F195]/60" : "text-[#9945FF]/60"}`}>{c.network}</span>
                   )}
                 </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] text-slate-600">{truncateAddress(c.authority)}</span>
-                  <span className="text-[10px] text-slate-700">·</span>
-                  <span className="text-[10px] text-slate-600">{timeAgo(c.timestamp)}</span>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className="text-[10px] text-[#4a4660] font-[family-name:var(--font-mono)]">{truncateAddress(c.authority)}</span>
+                  <span className="text-[10px] text-[#2a2445]">·</span>
+                  <span className="text-[10px] text-[#4a4660]">{timeAgo(c.timestamp)}</span>
                 </div>
               </div>
-              <div className="flex-shrink-0 mt-1">
+              <div className="flex-shrink-0 mt-1.5">
                 {c.revealed ? (
-                  <span className="text-[10px] text-[#14F195]/80 font-medium">✓ Verified</span>
+                  <span className="text-[10px] text-[#14F195]/70 font-semibold">✓ Verified</span>
                 ) : (
-                  <span className="text-[10px] text-amber-400/60">Pending</span>
+                  <span className="text-[10px] text-amber-400/50 font-medium">Pending</span>
                 )}
               </div>
             </a>
@@ -323,46 +340,46 @@ function TopAgents({
   const medals = ["🥇", "🥈", "🥉"];
   return (
     <div className="card-solana rounded-2xl p-6">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-solana-border flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/15 to-yellow-500/10 border border-[#1a1628] flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
           </div>
           <div>
             <h3 className="text-sm font-semibold">Top Agents</h3>
-            <p className="text-xs text-slate-500">By commitment activity</p>
+            <p className="text-[11px] text-[#6b6780]">By commitment activity</p>
           </div>
         </div>
-        <a href="/agents" className="text-xs text-[#9945FF]/80 hover:text-[#9945FF] transition-colors">View all →</a>
+        <a href="/agents" className="text-[11px] text-[#9945FF]/70 hover:text-[#9945FF] transition-colors font-medium">View all →</a>
       </div>
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-12 bg-slate-700/20 rounded-lg animate-pulse" />
+            <div key={i} className="h-14 bg-[#110f1a] rounded-xl animate-pulse" />
           ))}
         </div>
       ) : agents.length === 0 ? (
-        <div className="text-center py-8 text-slate-500 text-sm">No agents registered yet</div>
+        <div className="text-center py-10 text-[#6b6780] text-sm">No agents registered yet</div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1">
           {agents.slice(0, 7).map((agent, i) => (
-            <a key={agent.address} href={`/agent/${agent.authority}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#9945FF]/5 transition-all duration-200">
-              <div className="w-6 text-center text-sm">{i < 3 ? medals[i] : <span className="text-slate-600">{i + 1}</span>}</div>
+            <a key={agent.address} href={`/agent/${agent.authority}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#9945FF]/[0.04] transition-all duration-300 border border-transparent hover:border-[#1a1628]">
+              <div className="w-7 text-center text-sm">{i < 3 ? medals[i] : <span className="text-[#4a4660] font-[family-name:var(--font-mono)] text-[12px]">{i + 1}</span>}</div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">{agent.name}</div>
-                <div className="text-[10px] text-slate-600 hash-text">{truncateAddress(agent.authority)}</div>
+                <div className="text-[13px] font-semibold truncate">{agent.name}</div>
+                <div className="text-[10px] text-[#4a4660] font-[family-name:var(--font-mono)]">{truncateAddress(agent.authority)}</div>
               </div>
               <div className="text-right flex-shrink-0">
-                <div className="text-sm font-bold tabular-nums">{agent.totalCommitments}</div>
-                <div className="text-[10px] text-slate-600">commits</div>
+                <div className="text-[13px] font-[family-name:var(--font-syne)] font-bold tabular-nums">{agent.totalCommitments}</div>
+                <div className="text-[10px] text-[#4a4660]">commits</div>
               </div>
               <div className="text-right flex-shrink-0 ml-2">
-                <div className={`text-sm font-medium tabular-nums ${agent.accountabilityScore >= 80 ? "text-[#14F195]" : agent.accountabilityScore >= 50 ? "text-amber-400" : "text-slate-500"}`}>
+                <div className={`text-[13px] font-semibold tabular-nums ${agent.accountabilityScore >= 80 ? "text-[#14F195]" : agent.accountabilityScore >= 50 ? "text-amber-400" : "text-[#6b6780]"}`}>
                   {agent.accountabilityScore}%
                 </div>
-                <div className="text-[10px] text-slate-600">score</div>
+                <div className="text-[10px] text-[#4a4660]">score</div>
               </div>
             </a>
           ))}
@@ -424,74 +441,92 @@ export default function TractionDashboard() {
   }, []);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-16">
       {/* ─── Hero ────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl">
-        {/* Animated background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#9945FF]/10 via-[#13111C] to-[#14F195]/10" />
+      <div className="relative overflow-hidden rounded-[28px]">
+        {/* Layered background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#9945FF]/[0.07] via-[#06050a] to-[#14F195]/[0.05]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#06050a] via-transparent to-transparent" />
         <div className="absolute inset-0 hero-grid" />
 
-        {/* Glowing orbs */}
-        <div className="orb orb-purple w-[300px] h-[300px] -top-20 -left-20 animate-float" />
-        <div className="orb orb-green w-[200px] h-[200px] -bottom-10 -right-10 animate-float-delayed" />
-        <div className="orb orb-purple w-[150px] h-[150px] top-1/2 right-1/4 animate-glow" />
+        {/* Orbs with more depth */}
+        <div className="orb orb-purple w-[400px] h-[400px] -top-32 -left-32 animate-float" />
+        <div className="orb orb-green w-[250px] h-[250px] -bottom-16 -right-16 animate-float-delayed" />
+        <div className="orb orb-purple w-[180px] h-[180px] top-1/3 right-1/4 animate-glow" />
 
-        <div className="relative px-8 py-16 sm:py-20 text-center">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#14F195] pulse-dot" />
-            <span className="text-xs font-semibold text-[#14F195] tracking-[0.2em] uppercase">
-              Live on Solana
-            </span>
-          </div>
+        {/* Geometric accents */}
+        <div className="absolute top-12 left-12 w-24 h-24 border border-[#9945FF]/[0.08] rounded-full ring-spin hidden lg:block" />
+        <div className="absolute bottom-16 right-16 w-16 h-16 border border-[#14F195]/[0.08] rounded-lg rotate-45 animate-float-delayed hidden lg:block" />
 
-          <h1 className="text-5xl sm:text-7xl font-black tracking-tighter mb-4">
-            <span className="solana-gradient-text-animated">SOLPRISM</span>
-          </h1>
+        <div className="relative px-8 py-20 sm:py-28">
+          {/* Asymmetric layout — text left-aligned on large screens */}
+          <div className="max-w-3xl mx-auto lg:mx-0 lg:ml-8 xl:ml-16">
+            <div className="animate-fade-up" style={{ animationDelay: '0ms' }}>
+              <div className="flex items-center gap-2.5 mb-8">
+                <span className="w-2 h-2 rounded-full bg-[#14F195] pulse-dot" />
+                <span className="text-[11px] font-bold text-[#14F195] tracking-[0.25em] uppercase">
+                  Live on Solana
+                </span>
+              </div>
+            </div>
 
-          <p className="text-xl sm:text-2xl text-slate-300 max-w-2xl mx-auto mb-3 font-light">
-            Verifiable AI Reasoning on Solana
-          </p>
-          <p className="text-sm text-slate-500 max-w-xl mx-auto mb-8 leading-relaxed">
-            Every AI agent commits a cryptographic proof of its reasoning onchain before acting.
-            Browse, verify, and audit reasoning traces in real-time.
-          </p>
+            <div className="animate-fade-up" style={{ animationDelay: '80ms' }}>
+              <h1 className="text-6xl sm:text-8xl lg:text-9xl font-[family-name:var(--font-syne)] font-black tracking-[-0.04em] mb-6 leading-[0.9]">
+                <span className="solana-gradient-text-animated">SOL</span>
+                <span className="text-white/90">PRISM</span>
+              </h1>
+            </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <a
-              href="https://www.colosseum.com/agent-hackathon/projects/axiom-protocol"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative group px-8 py-3.5 rounded-xl font-bold text-black bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:opacity-90 transition-all duration-300 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40"
-            >
-              <div className="absolute inset-0 rounded-xl vote-cta-shimmer" />
-              <span className="relative flex items-center gap-2">
-                🏆 Vote for SOLPRISM
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </span>
-            </a>
-            <a
-              href="https://github.com/NeukoAI/axiom-protocol"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3.5 rounded-xl font-semibold text-slate-300 border border-solana-border hover:border-[#9945FF]/50 hover:text-white transition-all duration-300 bg-white/[0.02]"
-            >
-              <span className="flex items-center gap-2">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-                View on GitHub
-              </span>
-            </a>
-          </div>
+            <div className="animate-fade-up" style={{ animationDelay: '160ms' }}>
+              <p className="text-xl sm:text-2xl text-[#c5c2d4] mb-4 font-light leading-relaxed max-w-xl">
+                Verifiable AI Reasoning on Solana
+              </p>
+            </div>
 
-          {/* Refresh indicator */}
-          <div className="flex items-center justify-center gap-3 text-xs text-slate-600">
-            <span>Auto-refreshes every 30s</span>
-            <span>·</span>
-            <span>Next in {countdown}s</span>
+            <div className="animate-fade-up" style={{ animationDelay: '240ms' }}>
+              <p className="text-[14px] text-[#6b6780] max-w-lg mb-10 leading-[1.7]">
+                Every AI agent commits a cryptographic proof of its reasoning onchain before acting.
+                Browse, verify, and audit reasoning traces in real-time.
+              </p>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="animate-fade-up flex flex-col sm:flex-row items-start gap-4 mb-10" style={{ animationDelay: '320ms' }}>
+              <a
+                href="https://www.colosseum.com/agent-hackathon/projects/axiom-protocol"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative group px-8 py-3.5 rounded-xl font-bold text-black bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:opacity-90 transition-all duration-300 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-[1.02]"
+              >
+                <div className="absolute inset-0 rounded-xl vote-cta-shimmer" />
+                <span className="relative flex items-center gap-2.5 text-[14px]">
+                  🏆 Vote for SOLPRISM
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </a>
+              <a
+                href="https://github.com/NeukoAI/axiom-protocol"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-3.5 rounded-xl font-semibold text-[#8b87a0] border border-[#1a1628] hover:border-[#9945FF]/30 hover:text-white transition-all duration-300 bg-white/[0.02] hover:bg-white/[0.04] text-[14px]"
+              >
+                <span className="flex items-center gap-2.5">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                  View on GitHub
+                </span>
+              </a>
+            </div>
+
+            {/* Refresh indicator */}
+            <div className="animate-fade-up flex items-center gap-3 text-[11px] text-[#4a4660]" style={{ animationDelay: '400ms' }}>
+              <span className="font-[family-name:var(--font-mono)]">Auto-refresh 30s</span>
+              <span className="text-[#2a2445]">·</span>
+              <span className="font-[family-name:var(--font-mono)]">Next in {countdown}s</span>
+            </div>
           </div>
         </div>
       </div>
@@ -505,6 +540,7 @@ export default function TractionDashboard() {
           gradient="from-[#9945FF] to-purple-400"
           sub="Across devnet & mainnet"
           loading={loading}
+          index={0}
         />
         <HeroStat
           label="Reasoning Commits"
@@ -513,6 +549,7 @@ export default function TractionDashboard() {
           gradient="from-[#9945FF] to-[#14F195]"
           sub="SHA-256 hashes onchain"
           loading={loading}
+          index={1}
         />
         <HeroStat
           label="Verified Reveals"
@@ -521,6 +558,7 @@ export default function TractionDashboard() {
           gradient="from-[#14F195] to-emerald-400"
           sub={`${stats?.totalRevealRate ?? 0}% reveal rate`}
           loading={loading}
+          index={2}
         />
         <HeroStat
           label="Ecosystem Integrations"
@@ -529,93 +567,104 @@ export default function TractionDashboard() {
           gradient="from-amber-500 to-orange-400"
           sub="Eliza · Agent Kit · MCP · SDK"
           loading={false}
+          index={3}
         />
       </div>
 
       {/* ─── Traction Highlights ────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl border border-[#9945FF]/20 bg-gradient-to-r from-[#9945FF]/5 via-[#13111C] to-[#14F195]/5">
-        <div className="absolute inset-0 hero-grid opacity-[0.02]" />
-        <div className="relative px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center shadow-lg shadow-purple-500/20">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                <polyline points="17 6 23 6 23 12" />
-              </svg>
-            </div>
-            <div>
-              <div className="text-sm font-bold solana-gradient-text tracking-wide uppercase">Protocol Traction</div>
-              <div className="text-xs text-slate-400 mt-0.5">Real onchain data from Solana — not mock numbers</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-6 text-center">
-            {[
-              { label: "Agents", val: stats?.totalAgents ?? 0 },
-              { label: "Traces", val: stats?.totalCommitments ?? 0 },
-              { label: "Integrations", val: INTEGRATIONS.length },
-              { label: "Networks", val: 2 },
-            ].map((item, idx) => (
-              <div key={item.label} className="flex items-center gap-6">
-                {idx > 0 && <div className="w-px h-8 bg-solana-border" />}
-                <div>
-                  <div className="text-2xl font-bold text-white">
-                    {loading && idx < 2 ? "..." : typeof item.val === "number" ? <AnimatedNumber target={item.val} /> : item.val}
-                  </div>
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wider">{item.label}</div>
-                </div>
+      <Stagger index={0}>
+        <div className="relative overflow-hidden rounded-2xl border border-[#9945FF]/[0.12] bg-gradient-to-r from-[#9945FF]/[0.04] via-[#0d0b14] to-[#14F195]/[0.04]">
+          <div className="absolute inset-0 hero-grid opacity-30" />
+          <div className="relative px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                  <polyline points="17 6 23 6 23 12" />
+                </svg>
               </div>
-            ))}
+              <div>
+                <div className="text-[13px] font-[family-name:var(--font-syne)] font-bold solana-gradient-text tracking-wider uppercase">Protocol Traction</div>
+                <div className="text-[11px] text-[#6b6780] mt-0.5">Real onchain data from Solana — not mock numbers</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-8 text-center">
+              {[
+                { label: "Agents", val: stats?.totalAgents ?? 0 },
+                { label: "Traces", val: stats?.totalCommitments ?? 0 },
+                { label: "Integrations", val: INTEGRATIONS.length },
+                { label: "Networks", val: 2 },
+              ].map((item, idx) => (
+                <div key={item.label} className="flex items-center gap-8">
+                  {idx > 0 && <div className="w-px h-10 bg-[#1a1628]" />}
+                  <div>
+                    <div className="text-2xl font-[family-name:var(--font-syne)] font-extrabold text-white">
+                      {loading && idx < 2 ? <span className="text-[#4a4660]">...</span> : typeof item.val === "number" ? <AnimatedNumber target={item.val} /> : item.val}
+                    </div>
+                    <div className="text-[10px] text-[#4a4660] uppercase tracking-[0.15em] mt-0.5">{item.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </Stagger>
 
       {/* ─── Network Status ──────────────────────────────────────── */}
       <section>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9945FF]/20 to-[#14F195]/20 border border-solana-border flex items-center justify-center">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9945FF]/15 to-[#14F195]/15 border border-[#1a1628] flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#14F195]">
               <circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" />
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Network Status</h2>
-            <p className="text-xs text-slate-500">Live program data from both networks</p>
+            <h2 className="text-lg font-[family-name:var(--font-syne)] font-bold">Network Status</h2>
+            <p className="text-[11px] text-[#6b6780]">Live program data from both networks</p>
           </div>
         </div>
         <div className="grid md:grid-cols-2 gap-4">
-          <NetworkCard stats={stats?.devnet ?? { network: "devnet", agents: 0, commitments: 0, reveals: 0, revealRate: 0, lastCommitmentTs: null, loading: true, error: null }} accent="purple" />
-          <NetworkCard stats={stats?.mainnet ?? { network: "mainnet", agents: 0, commitments: 0, reveals: 0, revealRate: 0, lastCommitmentTs: null, loading: true, error: null }} accent="green" />
+          <NetworkCard stats={stats?.devnet ?? { network: "devnet", agents: 0, commitments: 0, reveals: 0, revealRate: 0, lastCommitmentTs: null, loading: true, error: null }} accent="purple" index={0} />
+          <NetworkCard stats={stats?.mainnet ?? { network: "mainnet", agents: 0, commitments: 0, reveals: 0, revealRate: 0, lastCommitmentTs: null, loading: true, error: null }} accent="green" index={1} />
         </div>
       </section>
 
       {/* ─── Charts ──────────────────────────────────────────────── */}
       <div className="grid md:grid-cols-2 gap-4">
-        <ActivityChart data={stats?.dailyActivity ?? {}} loading={loading} />
-        <ActionTypeChart data={stats?.actionTypes ?? {}} loading={loading} />
+        <Stagger index={0}>
+          <ActivityChart data={stats?.dailyActivity ?? {}} loading={loading} />
+        </Stagger>
+        <Stagger index={1}>
+          <ActionTypeChart data={stats?.actionTypes ?? {}} loading={loading} />
+        </Stagger>
       </div>
 
       {/* ─── Live Feed + Top Agents ──────────────────────────────── */}
       <div className="grid lg:grid-cols-5 gap-4">
         <div className="lg:col-span-3">
-          <LiveFeed commitments={stats?.recentCommitments ?? []} loading={loading} />
+          <Stagger index={0}>
+            <LiveFeed commitments={stats?.recentCommitments ?? []} loading={loading} />
+          </Stagger>
         </div>
         <div className="lg:col-span-2">
-          <TopAgents agents={stats?.topAgents ?? []} loading={loading} />
+          <Stagger index={1}>
+            <TopAgents agents={stats?.topAgents ?? []} loading={loading} />
+          </Stagger>
         </div>
       </div>
 
       {/* ─── Vote CTA Section ────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#9945FF]/20 via-[#13111C] to-[#14F195]/20" />
+      <div className="relative overflow-hidden rounded-[28px]">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#9945FF]/15 via-[#06050a] to-[#14F195]/15" />
         <div className="absolute inset-0 hero-grid" />
-        <div className="orb orb-purple w-[200px] h-[200px] -top-10 -right-10 animate-glow" />
-        <div className="orb orb-green w-[200px] h-[200px] -bottom-10 -left-10 animate-float" />
-        <div className="relative px-8 py-16 text-center">
-          <h2 className="text-3xl sm:text-4xl font-black mb-4">
+        <div className="orb orb-purple w-[250px] h-[250px] -top-16 -right-16 animate-glow" />
+        <div className="orb orb-green w-[250px] h-[250px] -bottom-16 -left-16 animate-float" />
+        <div className="relative px-8 py-20 text-center">
+          <h2 className="text-4xl sm:text-5xl font-[family-name:var(--font-syne)] font-black mb-5 tracking-tight">
             <span className="solana-gradient-text">Support SOLPRISM</span>
           </h2>
-          <p className="text-slate-400 max-w-lg mx-auto mb-8">
+          <p className="text-[#8b87a0] max-w-lg mx-auto mb-10 text-[15px] leading-relaxed">
             We&apos;re building the accountability layer for AI agents on Solana.
             Vote for us in the Colosseum Agent Hackathon to help make AI reasoning transparent.
           </p>
@@ -624,22 +673,22 @@ export default function TractionDashboard() {
               href="https://www.colosseum.com/agent-hackathon/projects/axiom-protocol"
               target="_blank"
               rel="noopener noreferrer"
-              className="relative group px-10 py-4 rounded-xl font-bold text-lg text-black bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:opacity-90 transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/50"
+              className="relative group px-10 py-4 rounded-xl font-bold text-lg text-black bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:opacity-90 transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/50 hover:scale-[1.02]"
             >
               <div className="absolute inset-0 rounded-xl vote-cta-shimmer" />
               <span className="relative">🏆 Vote Now on Colosseum</span>
             </a>
           </div>
-          <div className="flex items-center justify-center gap-6 mt-8 text-sm">
-            <a href="https://x.com/BasedMereum" target="_blank" className="text-slate-500 hover:text-[#14F195] transition-colors flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          <div className="flex items-center justify-center gap-8 mt-10 text-[13px]">
+            <a href="https://x.com/BasedMereum" target="_blank" className="text-[#6b6780] hover:text-[#14F195] transition-colors flex items-center gap-2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               @BasedMereum
             </a>
-            <a href="https://github.com/NeukoAI/axiom-protocol" target="_blank" className="text-slate-500 hover:text-[#14F195] transition-colors flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            <a href="https://github.com/NeukoAI/axiom-protocol" target="_blank" className="text-[#6b6780] hover:text-[#14F195] transition-colors flex items-center gap-2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
               GitHub
             </a>
-            <a href="https://www.npmjs.com/package/@solprism/sdk" target="_blank" className="text-slate-500 hover:text-[#14F195] transition-colors flex items-center gap-2">
+            <a href="https://www.npmjs.com/package/@solprism/sdk" target="_blank" className="text-[#6b6780] hover:text-[#14F195] transition-colors flex items-center gap-2">
               📦 npm SDK
             </a>
           </div>
@@ -648,76 +697,77 @@ export default function TractionDashboard() {
 
       {/* ─── Ecosystem ───────────────────────────────────────────── */}
       <section>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9945FF]/20 to-purple-500/20 border border-solana-border flex items-center justify-center">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9945FF]/15 to-purple-500/10 border border-[#1a1628] flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#9945FF]">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Ecosystem &amp; Integrations</h2>
-            <p className="text-xs text-slate-500">{INTEGRATIONS.length} integrations across major AI agent frameworks</p>
+            <h2 className="text-lg font-[family-name:var(--font-syne)] font-bold">Ecosystem &amp; Integrations</h2>
+            <p className="text-[11px] text-[#6b6780]">{INTEGRATIONS.length} integrations across major AI agent frameworks</p>
           </div>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {INTEGRATIONS.map((item) => (
-            <a
-              key={item.name}
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="card-solana rounded-2xl p-5 group"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-2xl">{item.icon}</div>
-                {item.badge && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                    item.badge === "PR Open" ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                    : item.badge === "Published" ? "bg-[#14F195]/10 text-[#14F195] border-[#14F195]/20"
-                    : item.badge === "Live" ? "bg-[#14F195]/10 text-[#14F195] border-[#14F195]/20"
-                    : "bg-[#9945FF]/10 text-[#9945FF] border-[#9945FF]/20"
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-              <div className="text-sm font-semibold group-hover:text-white transition-colors">{item.name}</div>
-              <div className="text-xs text-slate-500 mt-1">{item.desc}</div>
-              <div className="text-xs text-[#9945FF]/60 mt-3 group-hover:text-[#9945FF] transition-colors">View →</div>
-            </a>
+          {INTEGRATIONS.map((item, i) => (
+            <Stagger key={item.name} index={i} className="h-full">
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="card-solana rounded-2xl p-6 group block h-full"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-2xl">{item.icon}</div>
+                  {item.badge && (
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                      item.badge === "PR Open" ? "bg-amber-500/[0.08] text-amber-400 border-amber-500/15"
+                      : item.badge === "Published" ? "bg-[#14F195]/[0.08] text-[#14F195] border-[#14F195]/15"
+                      : item.badge === "Live" ? "bg-[#14F195]/[0.08] text-[#14F195] border-[#14F195]/15"
+                      : "bg-[#9945FF]/[0.08] text-[#b66dff] border-[#9945FF]/15"
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+                <div className="text-[14px] font-semibold group-hover:text-white transition-colors duration-300">{item.name}</div>
+                <div className="text-[12px] text-[#6b6780] mt-1.5 leading-relaxed">{item.desc}</div>
+                <div className="text-[11px] text-[#9945FF]/50 mt-4 group-hover:text-[#9945FF] transition-colors duration-300 font-medium">View →</div>
+              </a>
+            </Stagger>
           ))}
         </div>
       </section>
 
       {/* ─── Protocol Footer ─────────────────────────────────────── */}
       <div className="card-solana rounded-2xl p-6">
-        <div className="grid sm:grid-cols-3 gap-6 text-sm">
+        <div className="grid sm:grid-cols-3 gap-8 text-sm">
           <div>
-            <div className="text-xs text-slate-500 mb-2 uppercase tracking-wider font-medium">Program</div>
+            <div className="text-[10px] text-[#4a4660] mb-2.5 uppercase tracking-[0.15em] font-semibold">Program</div>
             <a
               href={explorerUrl("CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu", "address", "mainnet")}
               target="_blank"
-              className="hash-text text-slate-400 hover:text-[#14F195] transition-colors text-xs break-all"
+              className="font-[family-name:var(--font-mono)] text-[#6b6780] hover:text-[#14F195] transition-colors text-[12px] break-all"
             >
               CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu
             </a>
           </div>
           <div>
-            <div className="text-xs text-slate-500 mb-2 uppercase tracking-wider font-medium">Status</div>
+            <div className="text-[10px] text-[#4a4660] mb-2.5 uppercase tracking-[0.15em] font-semibold">Status</div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#14F195]" />
-              <span className="text-slate-400">Mainnet Immutable</span>
+              <span className="text-[#8b87a0] text-[13px]">Mainnet Immutable</span>
             </div>
           </div>
           <div>
-            <div className="text-xs text-slate-500 mb-2 uppercase tracking-wider font-medium">How It Works</div>
-            <div className="text-slate-400">Commit → Act → Reveal → Verify</div>
+            <div className="text-[10px] text-[#4a4660] mb-2.5 uppercase tracking-[0.15em] font-semibold">How It Works</div>
+            <div className="text-[#8b87a0] text-[13px] font-[family-name:var(--font-mono)]">Commit → Act → Reveal → Verify</div>
           </div>
         </div>
       </div>
 
       {/* Timestamp */}
-      <div className="text-center text-xs text-slate-700 pb-4">
+      <div className="text-center text-[11px] text-[#4a4660] pb-4 font-[family-name:var(--font-mono)]">
         Last refreshed: {lastRefresh.toLocaleTimeString()} · Data queried directly from Solana RPC
       </div>
     </div>

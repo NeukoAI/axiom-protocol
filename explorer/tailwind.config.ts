@@ -8,35 +8,44 @@ const config: Config = {
         solana: {
           purple: "#9945FF",
           green: "#14F195",
-          dark: "#0B0B0F",
-          darker: "#08080C",
-          card: "#13111C",
-          border: "#1E1A2E",
+          dark: "#06050a",
+          darker: "#030205",
+          card: "#110f1a",
+          border: "#1a1628",
         },
       },
+      fontFamily: {
+        syne: ["var(--font-syne)", "sans-serif"],
+        space: ["var(--font-space)", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
+      },
       animation: {
-        "float": "float 6s ease-in-out infinite",
-        "float-delayed": "float 6s ease-in-out 3s infinite",
-        "glow": "glow 4s ease-in-out infinite",
-        "gradient-x": "gradient-x 6s ease infinite",
-        "grid-fade": "grid-fade 8s ease-in-out infinite",
+        "float": "float 7s ease-in-out infinite",
+        "float-delayed": "float-delayed 7s ease-in-out 3.5s infinite",
+        "glow": "glow-pulse 5s ease-in-out infinite",
+        "fade-up": "fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "fade-in": "fade-in 0.6s ease both",
       },
       keyframes: {
         float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-20px)" },
+          "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
+          "50%": { transform: "translateY(-24px) rotate(1deg)" },
         },
-        glow: {
-          "0%, 100%": { opacity: "0.4" },
-          "50%": { opacity: "0.8" },
+        "float-delayed": {
+          "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
+          "50%": { transform: "translateY(-18px) rotate(-1deg)" },
         },
-        "gradient-x": {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.3" },
+          "50%": { opacity: "0.7" },
         },
-        "grid-fade": {
-          "0%, 100%": { opacity: "0.03" },
-          "50%": { opacity: "0.06" },
+        "fade-up": {
+          from: { opacity: "0", transform: "translateY(20px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
         },
       },
     },

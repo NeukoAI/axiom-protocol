@@ -1,0 +1,5 @@
+# Claude Memory files - auto-generated
+*.json
+*.log
+*.tmp
+!.gitignore

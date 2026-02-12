@@ -4,10 +4,35 @@
   "description": "TypeScript SDK for SOLPRISM — verifiable AI reasoning on Solana",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "tsc",
+    "prepublishOnly": "npm run build",
     "test": "vitest",
     "lint": "eslint src/"
+  },
+  "keywords": [
+    "solprism",
+    "solana",
+    "ai",
+    "reasoning",
+    "verifiable",
+    "blockchain",
+    "commit-reveal",
+    "cryptographic",
+    "transparency",
+    "accountability"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NeukoAI/axiom-protocol.git",
+    "directory": "sdk"
+  },
+  "homepage": "https://www.solprism.app/",
+  "bugs": {
+    "url": "https://github.com/NeukoAI/axiom-protocol/issues"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",
