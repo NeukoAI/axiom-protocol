@@ -471,7 +471,7 @@ export default function TractionDashboard() {
             </div>
 
             <div className="animate-fade-up" style={{ animationDelay: '80ms' }}>
-              <h1 className="text-6xl sm:text-8xl lg:text-9xl font-[family-name:var(--font-syne)] font-black tracking-[-0.04em] mb-6 leading-[0.9]">
+              <h1 className="text-[3.2rem] sm:text-8xl lg:text-9xl font-[family-name:var(--font-syne)] font-black tracking-[-0.04em] mb-6 leading-[0.9]">
                 <span className="solana-gradient-text-animated">SOL</span>
                 <span className="text-white/90">PRISM</span>
               </h1>
